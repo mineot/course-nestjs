@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthForgetDTO } from './dto/auth-forget.dto';
 import { AuthLoginDTO } from './dto/auth-login.dto';
+import { AuthMeDTO } from './dto/auth-me.dto';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { AuthResetDTO } from './dto/auth-reset.dto';
 
@@ -27,5 +28,10 @@ export class AuthController {
   @Post('reset')
   async reset(@Body() { password, token }: AuthResetDTO) {
     return this.authsvc.reset(password, token);
+  }
+
+  @Post('me')
+  async me(@Body() { token }: AuthMeDTO) {
+    return this.authsvc.verifyToken(token);
   }
 }
