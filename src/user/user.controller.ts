@@ -14,7 +14,7 @@ import { UpdatePatchUserDTO } from './dto/update-patch-user.dto';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { LogInterceptor } from 'src/core/interceptors/log/log.interceptor';
-import { ParamId } from 'src/core/decorators/param-id/param-id.decorator';
+import { ParamId } from 'src/core/decorators/param-id.decorator';
 
 @UseInterceptors(LogInterceptor) // para interceptar todas as rotas
 @Controller('users')
