@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdatePatchUserDTO } from './dto/update-patch-user.dto';
@@ -10,6 +11,8 @@ export class UserService {
   constructor(private readonly $prisma: PrismaService) {}
 
   async create(data: CreateUserDTO): Promise<User> {
+    const salt = await bcrypt.genSalt();
+    data.password = await bcrypt.hash(data.password, salt);
     return await this.$prisma.user.create({ data });
   }
 
@@ -27,21 +30,25 @@ export class UserService {
 
   async update(data: UpdatePutUserDTO, id: number): Promise<User> {
     await this.exists(id);
-    const { name, email, password, birthAt, role } = data;
+    const salt = await bcrypt.genSalt();
+    data.password = await bcrypt.hash(data.password, salt);
     return this.$prisma.user.update({
       data: {
-        name,
-        email,
-        password,
-        birthAt: birthAt ? new Date(birthAt) : null,
-        role,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        birthAt: data.birthAt ? new Date(data.birthAt) : null,
+        role: data.role,
       },
       where: { id },
     });
   }
-
   async updatePartial(data: UpdatePatchUserDTO, id: number): Promise<User> {
     await this.exists(id);
+    if (data.password) {
+      const salt = await bcrypt.genSalt();
+      data.password = await bcrypt.hash(data.password, salt);
+    }
     return this.$prisma.user.update({ data, where: { id } });
   }
 
