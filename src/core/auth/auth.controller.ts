@@ -1,4 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { User } from '../decorators/user.decorator';
 import { AuthGuard } from '../guards/auth.guard';
 import { AuthService } from './auth.service';
@@ -31,6 +32,7 @@ export class AuthController {
     return this.authsvc.reset(password, token);
   }
 
+  @SkipThrottle() // TODO when desire ignore the throttle
   @UseGuards(AuthGuard)
   @Post('me')
   async me(@User() user: any) {
