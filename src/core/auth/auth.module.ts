@@ -12,7 +12,7 @@ import { AuthService } from './auth.service';
     JwtModule.register({
       //   privateKey: '', // aqui poderemos gerar usando um gerador ssh
       //   publicKey: '',
-      secret: '00nxirD%t]azh%M_7hh~]C~f3qPYa]mx',
+      secret: process.env.JWT_SECRET,
     }),
   ],
   providers: [AuthService],

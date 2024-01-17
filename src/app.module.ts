@@ -1,4 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
@@ -13,6 +14,7 @@ import { UserModule } from './user/user.module';
     PrismaModule,
     forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
+    ConfigModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: 60,
