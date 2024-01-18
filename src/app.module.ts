@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './core/auth/auth.module';
+import { FileModule } from './core/file/file.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 
@@ -12,6 +13,7 @@ import { UserModule } from './user/user.module';
   controllers: [AppController],
   imports: [
     PrismaModule,
+    FileModule,
     forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
     ConfigModule.forRoot(),
