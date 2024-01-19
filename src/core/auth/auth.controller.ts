@@ -4,10 +4,15 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 import { SkipThrottle } from '@nestjs/throttler';
 import { User } from '../decorators/user.decorator';
 import { FileService } from '../file/file.service';
@@ -66,5 +71,37 @@ export class AuthController {
     }
 
     return { success: true };
+  }
+
+  @UseInterceptors(FilesInterceptor('files'))
+  @UseGuards(AuthGuard)
+  @Post('files')
+  async uploadFiles(
+    @User() user: any,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return { files };
+  }
+
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      {
+        name: 'photo',
+        maxCount: 1,
+      },
+      {
+        name: 'documents',
+        maxCount: 10,
+      },
+    ]),
+  )
+  @UseGuards(AuthGuard)
+  @Post('files-fields')
+  async uploadFilesFields(
+    @User() user: any,
+    @UploadedFiles()
+    files: { photo: Express.Multer.File; documents: Express.Multer.File[] },
+  ) {
+    return { files };
   }
 }
