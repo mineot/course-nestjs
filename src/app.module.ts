@@ -55,3 +55,5 @@ import { UserModule } from './user/user.module';
   ],
 })
 export class AppModule {}
+
+// TODO Do curdo até aqui: https://github.com/hcodebr/nestjs-prisma-mysql
