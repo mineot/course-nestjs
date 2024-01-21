@@ -26,8 +26,14 @@ import { UserModule } from './user/user.module';
       },
     ]),
     MailerModule.forRoot({
-      transport:
-        'smtps://celestino.feil99@ethereal.email:BzYazagzb9P8Bp3e8J@smtp.ethereal.email',
+      transport: {
+        host: 'smtp.ethereal.email',
+        port: 587,
+        auth: {
+          user: 'celestino.feil99@ethereal.email',
+          pass: 'BzYazagzb9P8Bp3e8J',
+        },
+      },
       defaults: {
         from: '"Celestino" <celestino.feil99@ethereal.email>',
       },

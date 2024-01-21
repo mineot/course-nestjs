@@ -1,3 +1,4 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
   Injectable,
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly jwtsvc: JwtService,
     private readonly prismasvc: PrismaService,
     private readonly usersvc: UserService,
+    private readonly mailer: MailerService,
   ) {}
 
   async createToken(user: User) {
@@ -91,22 +93,54 @@ export class AuthService {
       throw new UnauthorizedException('Email is invalid!');
     }
 
-    // TODO send an email
+    const resetToken = this.jwtsvc.sign(
+      {
+        id: user.id,
+      },
+      {
+        subject: String(user.id),
+        expiresIn: '30 minutes',
+        issuer: 'forget',
+        audience: 'users',
+      },
+    );
+
+    await this.mailer.sendMail({
+      subject: 'Reset your password',
+      to: 'test@test.com',
+      template: 'forget',
+      context: {
+        name: user.name,
+        token: resetToken,
+      },
+    });
 
     return true;
   }
 
   async reset(password: string, token: string) {
-    // TODO validar e extrair os dados do token
-    console.log(token);
-    const id = 0; // TODO este id vem do token
+    try {
+      const data: any = this.jwtsvc.verify(token, {
+        issuer: 'forget',
+        audience: 'users',
+      });
 
-    const user: User = await this.prismasvc.user.update({
-      where: { id },
-      data: { password },
-    });
+      if (isNaN(Number(data.id))) {
+        throw new BadRequestException('Invalid Token');
+      }
 
-    return this.createToken(user);
+      const salt = await bcrypt.genSalt();
+      password = await bcrypt.hash(password, salt);
+
+      const user: User = await this.prismasvc.user.update({
+        where: { id: Number(data.id) },
+        data: { password },
+      });
+
+      return this.createToken(user);
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
   }
 
   async register(data: AuthRegisterDTO) {
